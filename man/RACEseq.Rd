@@ -16,11 +16,18 @@ RACEseq(str, end, mismatch, RACE_adapter, tmap_opt)
 \item{RACE_adapter}{The RACE adapter to be trimmied using cutadapt .}
 
 \item{tmap_opt}{The option to use the Tmap aligner. Defaults FALSE}
+
+\item{pattern}{The filename extension to be deleted}
 }
 \description{
 Function to generate the alignment from a RACE sequencing experiment
 }
 \examples{
 RACEseq()
+File delete function
+
+Function to delete files generated in the process
+del_files()
 }
 \keyword{binding_region}
+\keyword{pattern}
