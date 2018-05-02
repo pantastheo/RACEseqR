@@ -1,0 +1,10 @@
+Package: RACEseqR
+Title: Downstream analysis package for 5-RACE Next Generation Sequencing experiments
+Version: 0.0.0.9000
+Authors@R: person("Pantazis", "Theotokis", email = "pan.theo@hotmail.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.4.0)
+License: open source
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
