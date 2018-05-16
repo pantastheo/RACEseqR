@@ -41,10 +41,6 @@ suppressMessages(packages(Biostrings))
 
 RACEseq <- function(str, end, mismatch, RACE_adapter, tmap_opt) {
 
-str<- opt$s
-end<- opt$e
-mismatch<- opt$mismatch
-RACE_adapter<- opt$a
 
 if(!is.na(str) & !is.na(end)) {
   #input the reference sequence in .fasta format
