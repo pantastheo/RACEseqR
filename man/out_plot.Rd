@@ -2,14 +2,12 @@
 % Please edit documentation in R/main_fun.r
 \name{out_plot}
 \alias{out_plot}
-\title{RACEseq plot function}
+\title{RACEseqR plot function}
 \usage{
-out_plot(binding_region, filename)
+out_plot(binding_region)
 }
 \arguments{
-\item{binding_region}{The region that will be plotted in the graph. Defaults NULL.}
-
-\item{filename}{The filename of the dataset}
+\item{binding_region}{The region that will be plotted in the graph. Can be an R dataframe or a tab delim file in your working directory. Defaults to NULL.}
 }
 \description{
 Function to generate and output the RACE seq plot of the specified start and end positions.

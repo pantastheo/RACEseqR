@@ -2,14 +2,14 @@
 % Please edit documentation in R/main_fun.r
 \name{out_csv}
 \alias{out_csv}
-\title{RACEseq dataframe function}
+\title{RACEseqR dataframe function}
 \usage{
-out_csv(binding_region, filename)
+out_csv(str, end)
 }
 \arguments{
-\item{binding_region}{The region that will be written in the csv file. Defaults NULL.}
+\item{str}{The start position of the binding region.}
 
-\item{filename}{The filename of the dataset}
+\item{end}{The end position of the binding region.}
 }
 \description{
 Function to generate and output the RACE seq dataframe of the specified start and end positions.

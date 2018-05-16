@@ -19,14 +19,14 @@ packages <- function(x) {
 }
 #List of required libraries to be loaded
 suppressMessages(packages(Biostrings))
-
+suppressMessages(packages(tools))
 
 # description = "This is a custom R script for the downstream analysis of RACE-seq data.",
 # epilogue = "Thank you for using RACE-SEQ lite"))
 
 
 
-#' RACEseq main function
+#' RACEseqR main function
 #'
 #' Function to generate the alignment from a RACE sequencing experiment
 #' @param str The start position of the binding region.
@@ -39,7 +39,7 @@ suppressMessages(packages(Biostrings))
 #' @examples
 #' RACEseq()
 
-RACEseq <- function(str, end, mismatch, RACE_adapter, tmap_opt) {
+RACEseqR <- function(str, end, mismatch, RACE_adapter, tmap_opt) {
 
 
 if(!is.na(str) & !is.na(end)) {
@@ -64,9 +64,6 @@ if(!is.na(str) & !is.na(end)) {
     }
 }else {stop("Please input Start and End nucleotide positions \n Or type [option] -h for help")}
 
-#reading and transforming reference sequence
-nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
-nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)
 
 #set output names
 filename <- paste("mm", mismatch, sep = "")
@@ -119,8 +116,81 @@ if (tmap_opt==TRUE){
   }
 }
 
-#read and merge ref and reads
-reads<- read.delim(out_name, header = F )
+}
+
+#remove read_count and index file created
+
+#' File delete function
+#'
+#' Function to delete files generated in the process
+#' @param pattern The filename extension to be deleted
+#' @keywords pattern
+#' @export
+#' @examples
+#' del_files()
+
+del_files<- function(pattern){
+  fl_rm<-list.files(".", pattern = pattern, all.files = F, full.names = F)
+  for(i in fl_rm){
+    i<-paste("rm", i , sep = " ")
+    system(i)
+  }
+}
+
+del_files("read_count_")
+del_files("fasta.tmap.")
+del_files("aligned.bam")
+del_files("out.sam")
+del_files("index")
+
+
+#' RACEseqR dataframe function
+#'
+#' Function to generate and output the RACE seq dataframe of the specified start and end positions.
+#' @param str The start position of the binding region.
+#' @param end The end position of the binding region.
+#' @keywords binding_region
+#' @export
+#' @examples
+#' out_csv()
+
+
+out_csv<- function(str, end) {
+
+if(!is.na(str) & !is.na(end))
+
+#reading and transforming reference sequence
+
+#input the reference sequence in .fasta format
+refname<- list.files(".", pattern ="fasta", all.files = F, full.names = F)
+if ((length(refname))==0) {
+  stop("No input .fasta reference file available")
+} else if ((length(refname))>=2) {
+  stop("More than one reference file")
+} else if ((length(refname))==1) {
+  replicon_ref<- as.character(refname)
+  nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
+  nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)
+}
+
+
+#read the output  file
+
+#input reads in txt format
+out_reads<- list.files(".", pattern ="read_count_", all.files = F, full.names = F)
+if ((length(out_reads))==0) {
+  stop("No output reads file available")
+} else if ((length(out_reads))>=2) {
+  stop("More than one output reads file")
+} else if ((length(out_reads))==1) {
+  out_reads<- as.character(out_reads)
+  reads<- read.delim(out_reads, header = F )
+}
+
+else {stop("Please input Start and End nucleotide positions")}
+
+#create dataframe with reference and reads
+
 dataframe<- data.frame(reads, nt_reference , stringsAsFactors = F)
 
 #calculating the % and log10 columns
@@ -131,108 +201,43 @@ dataframe[dataframe== -Inf] <-0
 #focusing on target region can be ajusted acording to experiment
 binding_region <- dataframe[str:end,]
 
-#remove read_count and index file created
-
-
-
-#' File delete function
-#'
-#' Function to delete files generated in the process
-#' @param pattern The filename extension to be deleted
-#' @keywords pattern
-#' @export
-#' @examples
-#' del_files()
-
-del_files<- function(pattern){
-  fl_rm<-list.files(".", pattern = pattern, all.files = F, full.names = F)
-  for(i in fl_rm){
-    i<-paste("rm", i , sep = " ")
-    system(i)
-  }
-}
-
-counts<- list.files(".", pattern="read_count", all.files = F, full.names = F)
-for(i in counts ){
-  i<- paste("rm", i , sep=" ")
-  system(i)
-}
-index_files<- list.files(".", pattern=".fasta.tmap.", all.files = F, full.names = F)
-for(i in index_files ){
-  i<- paste("rm", i , sep=" ")
-  system(i)
-}
-index_files<- list.files(".", pattern="aligned.bam", all.files = F, full.names = F)
-for(i in index_files ){
-  i<- paste("rm", i , sep=" ")
-  system(i)
-}
-index_files<- list.files(".", pattern="out.sam", all.files = F, full.names = F)
-for(i in index_files ){
-  i<- paste("rm", i , sep=" ")
-  system(i)
-}
-index_files<- list.files(".", pattern="index", all.files = F, full.names = F)
-for(i in index_files ){
-  i<- paste("rm", i , sep=" ")
-  system(i)
-}
-
-return(binding_region)
-}
-
-#remove read_count and index file created
-
-#' File delete function
-#'
-#' Function to delete files generated in the process
-#' @param pattern The filename extension to be deleted
-#' @keywords pattern
-#' @export
-#' @examples
-#' del_files()
-
-del_files<- function(pattern){
-  fl_rm<-list.files(".", pattern = pattern, all.files = F, full.names = F)
-  for(i in fl_rm){
-    i<-paste("rm", i , sep = " ")
-    system(i)
-  }
+outfilename<- file_path_sans_ext(((strsplit(out_reads, "_")) [[1]])[[3]])
+write.table(binding_region, file = paste0(outfilename, ".txt") , sep = "\t", col.names = c("reference", "position", "count", "nucleotide", "percentage", "log10" ), row.names = F )
 }
 
 
-
-#' RACEseq dataframe function
-#'
-#' Function to generate and output the RACE seq dataframe of the specified start and end positions.
-#' @param binding_region The region that will be written in the csv file. Defaults NULL.
-#' @param filename The filename of the dataset
-#' @keywords binding_region
-#' @export
-#' @examples
-#' out_csv()
-
-out_csv<- function(binding_region, filename){
-  write.table(binding_region, file = paste0(filename, ".csv") , sep = "\t", col.names = c("reference", "position", "count", "nucleotide", "percentage", "log10" ), row.names = F )
-}
-
-
-
-
-#' RACEseq plot function
+#' RACEseqR plot function
 #'
 #' Function to generate and output the RACE seq plot of the specified start and end positions.
-#' @param binding_region The region that will be plotted in the graph. Defaults NULL.
-#' @param filename The filename of the dataset
+#' @param binding_region The region that will be plotted in the graph. Can be an R dataframe or a tab delim file in your working directory. Defaults to NULL.
 #' @keywords binding_region
 #' @export
 #' @examples
 #' out_plot()
 
-out_plot<- function(binding_region, filename){
+out_plot<- function(binding_region){
+
+
+  if(!is.na(binding_region))
+    outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
+
+  else {
+    #read the output binding region tab delim file
+
+    #input reads in txt format
+    outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
+    if ((length(outfile_csv))==0) {
+      stop("No output reads .txt file available")
+    } else if ((length(outfile_csv))>=2) {
+      stop("More than one output reads .txt file")
+    } else if ((length(outfile_csv))==1) {
+      outfile_csv<- as.character(outfile_csv)
+      binding_region<- read.csv(outfile_csv, header = F )
+    }
+    }
 
   #create wildtype linear & log scale graph
-  pdf(paste0(filename, ".pdf"), width=15)
+  pdf(paste0((file_path_sans_ext(outfile_csv)) , ".pdf"), width=15)
 
   mp <- barplot(binding_region[,5],
                 ylab="Novel 5\' Ends (%)",
