@@ -21,16 +21,18 @@ packages <- function(x) {
 suppressMessages(packages(Biostrings))
 suppressMessages(packages(tools))
 
-# description = "This is a custom R script for the downstream analysis of RACE-seq data.",
-# epilogue = "Thank you for using RACE-SEQ lite"))
-
 
 
 #' RACEseqR main function
 #'
-#' Function to generate the alignment from a RACE sequencing experiment
-#' @param str The start position of the binding region.
-#' @param end The end position of the binding region.
+#' @description Function to generate the alignment from a RACE sequencing experiment using the BOWTIE aligner
+#' @details The The following UNIX command line programs and packages must be installed on your computer separately.
+#' @details Package  Version
+#' @details Cutadapt (optional)  >= 1.12
+#' @details Bowtie 1.0.0
+#' @details Samtools >=1.3.1
+#' @details Bedtools >=2.17.0
+#' @details Tmap (optional)  >=3.4.1
 #' @param mismatch The number of mismatches to be accepted during alignment.
 #' @param RACE_adapter The RACE adapter to be trimmied using cutadapt .
 #' @param tmap_opt The option to use the Tmap aligner. Defaults FALSE
@@ -39,31 +41,27 @@ suppressMessages(packages(tools))
 #' @examples
 #' RACEseq()
 
-RACEseqR <- function(str, end, mismatch, RACE_adapter, tmap_opt) {
+RACEseq <- function(mismatch, RACE_adapter, tmap_opt) {
 
-
-if(!is.na(str) & !is.na(end)) {
   #input the reference sequence in .fasta format
   refname<- list.files(".", pattern ="fasta", all.files = F, full.names = F)
-    if ((length(refname))==0) {
-      stop("No input .fasta reference file available")
-    } else if ((length(refname))>=2) {
-      stop("More than one reference file")
-    } else if ((length(refname))==1) {
-      replicon_ref<- as.character(refname)
-    }
+  if ((length(refname))==0) {
+    stop("No input .fasta reference file available")
+  } else if ((length(refname))>=2) {
+    stop("More than one reference file")
+  } else if ((length(refname))==1) {
+    replicon_ref<- as.character(refname)
+  }
 
   #input the data in .fastq or .fastq.gz format
   data_fastq<- list.files(".", pattern="fastq", all.files = F, full.names = F)
-    if ((length(data_fastq))==0) {
-      stop("No input .fastq file available")
-    } else if ((length(data_fastq))>=2) {
-      stop("More than one .fastq file")
-    } else if ((length(data_fastq))==1) {
-      input_data<- data_fastq
-    }
-}else {stop("Please input Start and End nucleotide positions \n Or type [option] -h for help")}
-
+  if ((length(data_fastq))==0) {
+    stop("No input .fastq file available")
+  } else if ((length(data_fastq))>=2) {
+    stop("More than one .fastq file")
+  } else if ((length(data_fastq))==1) {
+    input_data<- data_fastq
+  }
 
 #set output names
 filename <- paste("mm", mismatch, sep = "")
@@ -137,11 +135,6 @@ del_files<- function(pattern){
   }
 }
 
-del_files("read_count_")
-del_files("fasta.tmap.")
-del_files("aligned.bam")
-del_files("out.sam")
-del_files("index")
 
 
 #' RACEseqR dataframe function
@@ -208,8 +201,8 @@ write.table(binding_region, file = paste0(outfilename, ".txt") , sep = "\t", col
 
 #' RACEseqR plot function
 #'
-#' Function to generate and output the RACE seq plot of the specified start and end positions.
-#' @param binding_region The region that will be plotted in the graph. Can be an R dataframe or a tab delim file in your working directory. Defaults to NULL.
+#' @description Function to generate and output the RACE seq plot of the specified start and end positions.
+#' @param binding_region The region that will be plotted in the graph. Can be an R dataframe or a tab delim file in your working directory.
 #' @keywords binding_region
 #' @export
 #' @examples
@@ -268,3 +261,9 @@ out_plot<- function(binding_region){
   dev.off()
 
 }
+
+del_files("read_count_")
+del_files("fasta.tmap.")
+del_files("aligned.bam")
+del_files("out.sam")
+del_files("index")
