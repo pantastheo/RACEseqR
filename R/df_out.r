@@ -14,40 +14,45 @@
 
 out_csv<- function(str, end, replicon_ref) {
     
-    #reading and transforming reference sequence
-    if(is.na(replicon_ref))
-      #input the reference sequence in .fasta format
-      refname<- list.files(".", pattern ="fasta", all.files = F, full.names = F)
-      if ((length(refname))==0) {
-       stop("No input .fasta reference file available")
-       } else if ((length(refname))>=2) {
-       stop("More than one reference file")
-       } else if ((length(refname))==1) {
-       replicon_ref<- as.character(refname)
-       nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
-       nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)
-     }
-    else {
-      nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
-      nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)}
-  
-  
   #read the output  file
   
-  #input reads in txt format
+  #input reads in .txt format
   out_reads<- list.files(".", pattern ="read_count_", all.files = F, full.names = F)
   if ((length(out_reads))==0) {
     stop("No output reads file available")
-  } else if ((length(out_reads))>=2) {
+  } 
+  else if ((length(out_reads))>=2) {
     stop("More than one output reads file")
-  } else if ((length(out_reads))==1) {
+  } 
+  else if ((length(out_reads))==1) {
     out_reads<- as.character(out_reads)
     reads<- read.delim(out_reads, header = F )
   }
+  else { 
+    stop("No read counts file available")}
   
-  else 
-    {stop("No read counts file available")}
-
+  
+  #reading and transforming reference sequence
+  if(is.na(replicon_ref))
+    #input the reference sequence in .fasta format
+    refname<- list.files(".", pattern ="fasta", all.files = F, full.names = F)
+  if ((length(refname))==0) {
+    stop("No input .fasta reference file available")
+  } 
+  else if ((length(refname))>=2) {
+    stop("More than one reference file")
+  } 
+  else if ((length(refname))==1) {
+    replicon_ref<- as.character(refname)
+    nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
+    nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)
+  }
+  else {
+    nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
+    nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)}
+  
+  
+  
   #create dataframe with reference and reads
   
   dataframe<- data.frame(reads, nt_reference , stringsAsFactors = F)

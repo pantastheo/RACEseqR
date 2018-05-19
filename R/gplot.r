@@ -13,22 +13,20 @@
 out_plot<- function(binding_region, filename){
   
   
-  if(!is.na(binding_region))
-    outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
-  
-  else {
+  if(is.na(binding_region))
     #read the output binding region tab delim file
-    
     #input reads in txt format
     outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
     if ((length(outfile_csv))==0) {
       stop("No output reads .txt file available")
-    } else if ((length(outfile_csv))>=2) {
+      } else if ((length(outfile_csv))>=2) {
       stop("More than one output reads .txt file")
-    } else if ((length(outfile_csv))==1) {
+      } else if ((length(outfile_csv))==1) {
       outfile_csv<- as.character(outfile_csv)
       binding_region<- read.csv(outfile_csv, header = F )
-    }
+  }
+  else {
+    binding_region <- binding_region
   }
   
   #create wildtype linear & log scale graph
