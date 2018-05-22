@@ -15,9 +15,9 @@
 #' @seealso tmap_trim_align
 
 tmap_align<- function(input_data, replicon_ref, mismatch, out_name){
-
-  if(missing(out_name)) out_name<- "read_count.txt"
+  
   if(missing(mismatch)) mismatch<- 0
+  if(missing(out_name)) out_name<- "alignment"
   if(missing(input_data)) {
     #reading ref sequence from  working dir
     input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
@@ -43,7 +43,7 @@ tmap_align<- function(input_data, replicon_ref, mismatch, out_name){
 
   #perform alignment with tmap and read count using bedtools with no adapter trimming
   print(paste0("Performing alignment with ", mismatch, " mismatch using tmap"))
-  CMD_tmap<- paste("tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -r ", input_data, " | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > ",out_name, sep="")
+  CMD_tmap<- paste("tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -r ", input_data, " | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
   system(CMD_tmap)
 }
 
@@ -68,9 +68,9 @@ tmap_align<- function(input_data, replicon_ref, mismatch, out_name){
 
 tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, out_name){
   
-  if(missing(RACE_adapter)) print("No RACE adapter sequence available for trimming")
-  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(RACE_adapter)) stop("No RACE adapter sequence available for trimming")
   if(missing(mismatch)) mismatch<- 0
+  if(missing(out_name)) out_name<- "alignment"
   if(missing(input_data)) {
     #reading input data from  working dir
     input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
@@ -96,7 +96,7 @@ tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, ou
   
   #adapter trimming using cutadapt and alignment with tmap and read count using bedtools
   print(paste0("Performing adapter trimming and alignment with ", mismatch, " mismatch using tmap"))
-  CMD_tmap<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -i fastq | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > ",out_name, sep="")
+  CMD_tmap<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -i fastq | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
   system(CMD_tmap) 
 }
 
@@ -119,8 +119,8 @@ tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, ou
 
 bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
 
-  if(missing(out_name)) out_name<- "read_count.txt"
   if(missing(mismatch)) mismatch<- 0
+  if(missing(out_name)) out_name<- "alignment"
   if(missing(input_data)) {
     #reading ref sequence from  working dir
     input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
@@ -146,7 +146,7 @@ bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
 
   #perform alignment with bowtie and read count using bedtools with no adapter trimming
   print(paste0("Performing alignment with ", mismatch, " mismatch using bowtie"))
-  CMD_bow<- paste("bowtie -p 2 -S -k 1 -v", mismatch, "index", input_data," | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin >", out_name, sep=" ")
+  CMD_bow<- paste("bowtie -p 2 -S -k 1 -v ", mismatch, " index ", input_data," | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
   system(CMD_bow)
 }
 
@@ -170,9 +170,9 @@ bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
 
 bowtie_trim_align <- function(input_data, replicon_ref, mismatch, RACE_adapter, out_name){
 
-  if(missing(RACE_adapter)) print("No RACE adapter sequence available for trimming")
-  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(RACE_adapter)) stop("No RACE adapter sequence available for trimming")
   if(missing(mismatch)) mismatch<- 0
+  if(missing(out_name)) out_name<- "alignment"
   if(missing(input_data)) {
     #reading input data from  working dir
     input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
@@ -198,7 +198,7 @@ bowtie_trim_align <- function(input_data, replicon_ref, mismatch, RACE_adapter, 
   
   #adapter trimming using cutadapt and alignment with bowtie and read count using bedtools
   print(paste0("Performing adapter trimming and alignment with ", mismatch, " mismatch using bowtie"))
-  CMD_bow<- paste("cutadapt -g", RACE_adapter, "-e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data,"|bowtie -p 8 -S -k 1 -v", mismatch, "index - | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin >", out_name, sep=" ")
+  CMD_bow<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |bowtie -p 8 -S -k 1 -v ", mismatch, " index - | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
   system(CMD_bow)
 }
 

@@ -10,24 +10,28 @@
 #' @examples
 #' out_plot()
 
-out_plot<- function(binding_region, filename){
+plot_out<- function(binding_region, filename) {
   
-  if(missing(filename)) filename<- "RACE_seq_graph"
-  if(missing(binding_region))
+  #setting function call conditions
+  if(missing(filename)) filename<- "RACE_graph"
+  if(missing(binding_region)){
     #read the output binding region tab delim file
-    #input reads in txt format
-    outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
-    if ((length(outfile_csv))==0) {
+    #input reads from working dir
+    datafile_input<- list.files(".", pattern ="datafile_", all.files = F, full.names = F)
+    if ((length(datafile_input))==0) {
       stop("No output reads .txt file available")
-      } else if ((length(outfile_csv))>=2) {
+    } else if ((length(datafile_input))>=2) {
       stop("More than one output reads .txt file")
-      } else if ((length(outfile_csv))==1) {
-      outfile_csv<- as.character(outfile_csv)
-      binding_region<- read.csv(outfile_csv, header = F )
-    }
+    } 
+    binding_region<- read.csv(datafile_input, header = F )
+    out_name<- file_path_sans_ext(((strsplit(datafile_input, "_")) [[1]])[[2]])
+  }
 
+  
+  
   #create wildtype linear & log scale graph
-  pdf(paste0(filename , ".pdf"), width=15)
+  
+  pdf(paste0(filename, out_name, ".pdf"), width=15)
   
   mp <- barplot(binding_region[,5],
                 ylab="Novel 5\' Ends (%)",
