@@ -12,8 +12,8 @@
 
 out_plot<- function(binding_region, filename){
   
-  
-  if(is.na(binding_region))
+  if(missing(filenme)) filename<- "RACE_seq_graph"
+  if(missing(binding_region))
     #read the output binding region tab delim file
     #input reads in txt format
     outfile_csv<- list.files(".", pattern =".txt", all.files = F, full.names = F)
@@ -24,11 +24,8 @@ out_plot<- function(binding_region, filename){
       } else if ((length(outfile_csv))==1) {
       outfile_csv<- as.character(outfile_csv)
       binding_region<- read.csv(outfile_csv, header = F )
-  }
-  else {
-    binding_region <- binding_region
-  }
-  
+    }
+
   #create wildtype linear & log scale graph
   pdf(paste0(filename , ".pdf"), width=15)
   
@@ -61,12 +58,3 @@ out_plot<- function(binding_region, filename){
   dev.off()
   
 }
-
-
-
-
-
-
-
-
-
