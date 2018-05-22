@@ -21,15 +21,7 @@ datafile_out<- function(str, end, replicon_ref) {
   if(!end %in% seq(1, 10000000, by = 1)) stop("end value must be >= 1)")
   
   #reading ref sequence name from function call
-  if(missing(replicon_ref)) {
-    #reading ref sequence from  working dir
-    replicon_ref<- as.character(list.files(".", pattern ="fasta", all.files = F, full.names = F))
-    if ((length(replicon_ref))==0) {
-      stop("No input .fasta reference file available")
-    } else if ((length(replicon_ref))>=2) {
-      stop("More than one .fasta reference file")
-    }
-  }
+  if(missing(replicon_ref)) stop("No input .fasta reference file available")
   
   #transforming reference sequence
   nt_reference <-strsplit((toString(readBStringSet(replicon_ref))), NULL , fixed = T)
@@ -56,10 +48,10 @@ datafile_out<- function(str, end, replicon_ref) {
   #focusing on target region can be ajusted acording to experiment
   binding_region <- dataframe[str:end,]
   
-  out_reads<- "datafile_mm0.txt"
-  
   out_name<- file_path_sans_ext(((strsplit(out_reads, "_")) [[1]])[[2]])
   
   write.table(binding_region, file = paste0("datafile_",out_name, ".txt") , sep = "\t", col.names = c("reference", "position", "count", "nucleotide", "percentage", "log10" ), row.names = F )
+  
+  return(binding_region)
   }
   

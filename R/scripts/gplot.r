@@ -25,13 +25,14 @@ plot_out<- function(binding_region, filename) {
     } 
     binding_region<- read.csv(datafile_input, header = F )
     out_name<- file_path_sans_ext(((strsplit(datafile_input, "_")) [[1]])[[2]])
+    filename<- paste0(filename,"_", out_name)
   }
 
   
   
   #create wildtype linear & log scale graph
   
-  pdf(paste0(filename, out_name, ".pdf"), width=15)
+  pdf(paste0(filename,".pdf"), width=15)
   
   mp <- barplot(binding_region[,5],
                 ylab="Novel 5\' Ends (%)",
