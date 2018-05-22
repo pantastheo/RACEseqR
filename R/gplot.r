@@ -12,7 +12,7 @@
 
 out_plot<- function(binding_region, filename){
   
-  if(missing(filenme)) filename<- "RACE_seq_graph"
+  if(missing(filename)) filename<- "RACE_seq_graph"
   if(missing(binding_region))
     #read the output binding region tab delim file
     #input reads in txt format

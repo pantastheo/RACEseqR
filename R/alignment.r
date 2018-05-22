@@ -14,11 +14,29 @@
 #' @seealso bowtie_trim_align
 #' @seealso tmap_trim_align
 
-
-
-
 tmap_align<- function(input_data, replicon_ref, mismatch, out_name){
 
+  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(mismatch)) mismatch<- 0
+  if(missing(input_data)) {
+    #reading ref sequence from  working dir
+    input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
+    if ((length(input_data))==0) {
+      stop("No input .fastq data file available")
+    } else if ((length(input_data))>=2) {
+      stop("More than one input .fastq data file available")
+    }
+  }
+  if(missing(replicon_ref)) {
+    #reading ref sequence from  working dir
+    replicon_ref<- as.character(list.files(".", pattern ="fasta", all.files = F, full.names = F))
+    if ((length(replicon_ref))==0) {
+      stop("No input .fasta reference file available")
+    } else if ((length(replicon_ref))>=2) {
+      stop("More than one .fasta reference file")
+    }
+  }
+  
   #build the index
   CMD_tmapindex<- paste("tmap index -f", replicon_ref , sep=" ")
   system(CMD_tmapindex)
@@ -48,8 +66,29 @@ tmap_align<- function(input_data, replicon_ref, mismatch, out_name){
 #' @seealso bowtie_trim_align
 #' @seealso tmap_align
 
-
 tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, out_name){
+  
+  if(missing(RACE_adapter)) print("No RACE adapter sequence available for trimming")
+  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(mismatch)) mismatch<- 0
+  if(missing(input_data)) {
+    #reading input data from  working dir
+    input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
+    if ((length(input_data))==0) {
+      stop("No input .fastq data file available")
+    } else if ((length(input_data))>=2) {
+      stop("More than one input .fastq data file available")
+    }
+  }
+  if(missing(replicon_ref)) {
+    #reading ref sequence from  working dir
+    replicon_ref<- as.character(list.files(".", pattern ="fasta", all.files = F, full.names = F))
+    if ((length(replicon_ref))==0) {
+      stop("No input .fasta reference file available")
+    } else if ((length(replicon_ref))>=2) {
+      stop("More than one .fasta reference file")
+    }
+  }
   
   #build the index
   CMD_tmapindex<- paste("tmap index -f", replicon_ref , sep=" ")
@@ -60,6 +99,8 @@ tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, ou
   CMD_tmap<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -i fastq | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > ",out_name, sep="")
   system(CMD_tmap) 
 }
+
+
 
 #' RACEseqR BOWTIE alignment function
 #'
@@ -76,10 +117,29 @@ tmap_trim_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, ou
 #' @seealso tmap_align
 #' @seealso tmap_trim_align
 
-
-
 bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
 
+  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(mismatch)) mismatch<- 0
+  if(missing(input_data)) {
+    #reading ref sequence from  working dir
+    input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
+    if ((length(input_data))==0) {
+      stop("No input .fastq data file available")
+    } else if ((length(input_data))>=2) {
+      stop("More than one input .fastq data file available")
+    }
+  }
+  if(missing(replicon_ref)) {
+    #reading ref sequence from  working dir
+    replicon_ref<- as.character(list.files(".", pattern ="fasta", all.files = F, full.names = F))
+    if ((length(replicon_ref))==0) {
+      stop("No input .fasta reference file available")
+    } else if ((length(replicon_ref))>=2) {
+      stop("More than one .fasta reference file")
+    }
+  }
+  
   #build the index 
   CMD_bowindex<- paste("bowtie-build -q -f", replicon_ref, "index", sep=" ")
   system(CMD_bowindex)
@@ -89,6 +149,8 @@ bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
   CMD_bow<- paste("bowtie -p 2 -S -k 1 -v", mismatch, "index", input_data," | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin >", out_name, sep=" ")
   system(CMD_bow)
 }
+
+
 
 #' RACEseqR BOWTIE alignment function
 #'
@@ -108,6 +170,28 @@ bowtie_align<- function(input_data, replicon_ref, mismatch, out_name){
 
 bowtie_trim_align <- function(input_data, replicon_ref, mismatch, RACE_adapter, out_name){
 
+  if(missing(RACE_adapter)) print("No RACE adapter sequence available for trimming")
+  if(missing(out_name)) out_name<- "read_count.txt"
+  if(missing(mismatch)) mismatch<- 0
+  if(missing(input_data)) {
+    #reading input data from  working dir
+    input_data<- as.character(list.files(".", pattern ="fastq", all.files = F, full.names = F))
+    if ((length(input_data))==0) {
+      stop("No input .fastq data file available")
+    } else if ((length(input_data))>=2) {
+      stop("More than one input .fastq data file available")
+    }
+  }
+  if(missing(replicon_ref)) {
+    #reading ref sequence from  working dir
+    replicon_ref<- as.character(list.files(".", pattern ="fasta", all.files = F, full.names = F))
+    if ((length(replicon_ref))==0) {
+      stop("No input .fasta reference file available")
+    } else if ((length(replicon_ref))>=2) {
+      stop("More than one .fasta reference file")
+    }
+  }
+  
   #build the index 
   CMD_bowindex<- paste("bowtie-build -q -f", replicon_ref, "index", sep=" ")
   system(CMD_bowindex)

@@ -35,21 +35,13 @@ out_csv<- function(str, end, replicon_ref) {
   nt_reference<- data.frame(lapply(nt_reference, function(x) toupper(x)), stringsAsFactors = F)
   
   #read the output  file
-  
   #input reads in .txt format
-  out_reads<- list.files(".", pattern ="read_count_", all.files = F, full.names = F)
+  out_reads<- list.files(".", pattern ="txt", all.files = F, full.names = F)
   if ((length(out_reads))==0) {
     stop("No output reads file available")
-  } 
-  else if ((length(out_reads))>=2) {
+  } else if ((length(out_reads))>=2) {
     stop("More than one output reads file")
-  } 
-  else if ((length(out_reads))==1) {
-    out_reads<- as.character(out_reads)
-    reads<- read.delim(out_reads, header = F )
   }
-  else { 
-    stop("No read counts file available")}
   
   #create dataframe with reference and reads
   
