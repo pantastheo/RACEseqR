@@ -61,5 +61,6 @@ main_RACE_seq_R<- function(input_data, replicon_ref, mismatch, RACE_adapter, str
 
   plot_out(binding_region, filename)
 
+  return(binding_region)
 }
 
