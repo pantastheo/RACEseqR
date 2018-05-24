@@ -4,8 +4,8 @@
 \alias{RACEseq}
 \title{RACEseq main function}
 \usage{
-RACEseq(input_data, replicon_ref, mismatch, RACE_adapter, str, end, filename,
-  aligner)
+RACEseq(input_data, replicon_ref, mismatch = 0, RACE_adapter = NULL, str,
+  end, filename, tmap)
 }
 \arguments{
 \item{input_data}{The input .fastq files to be used for the alignment.}
@@ -22,7 +22,7 @@ RACEseq(input_data, replicon_ref, mismatch, RACE_adapter, str, end, filename,
 
 \item{filename}{The filename that will be used for the output pdf file.}
 
-\item{aligner}{The option to use the Tmap aligner. Defaults FALSE.}
+\item{tmap}{The option to use the Tmap aligner. Defaults NULL}
 }
 \description{
 Function to generate the alignment from a RACE sequencing experiment
