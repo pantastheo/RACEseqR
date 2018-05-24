@@ -1,21 +1,4 @@
 
-
-#Main function to call all sub founctions in main source directory R.
-source_dir <- function(path, trace = TRUE, ...) {
-  for (nm in list.files(path, pattern = "[.][RrSsQq]$")) {
-    if(trace) cat(nm,":")
-    source(file.path(path, nm), ...)
-    if(trace) cat("\n")
-  }
-}
-
-source_dir("R/alignment")
-source_dir("R/scripts")
-
-#List of required libraries to be loaded
-suppressMessages(packages(Biostrings))
-suppressMessages(packages(tools))
-
 #' RACEseq main function
 #'
 #' Function to generate the alignment from a RACE sequencing experiment
@@ -35,6 +18,23 @@ suppressMessages(packages(tools))
 
 
 RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, str, end, filename, tmap ) {
+
+
+  #Main function to call all sub founctions in main RACEseqR directory R.
+  source_dir <- function(path, trace = TRUE, ...) {
+    for (nm in list.files(path, pattern = "[.][RrSsQq]$")) {
+      if(trace) cat(nm,":")
+      source(file.path(path, nm), ...)
+      if(trace) cat("\n")
+    }
+  }
+
+  source_dir("R/alignment")
+  source_dir("R/scripts")
+
+  #List of required libraries to be loaded
+  suppressMessages(packages(Biostrings))
+  suppressMessages(packages(tools))
 
   if(missing(str)) stop("str value must be set")
   if(missing(end)) stop("end value must be set")
