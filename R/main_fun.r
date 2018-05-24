@@ -16,7 +16,25 @@ source_dir("R/scripts")
 suppressMessages(packages(Biostrings))
 suppressMessages(packages(tools))
 
-main_RACE_seq_R<- function(input_data, replicon_ref, mismatch, RACE_adapter, str, end, filename, aligner ) {
+#' RACEseq main function
+#'
+#' Function to generate the alignment from a RACE sequencing experiment
+#' @param input_data The input .fastq files to be used for the alignment.
+#' @param replicon_ref The reference sequence to be used in the alignment.
+#' @param str The start position of the binding region.
+#' @param end The end position of the binding region.
+#' @param mismatch The number of mismatches to be accepted during alignment.
+#' @param RACE_adapter The RACE adapter to be trimmied using cutadapt .
+#' @param tmap The option to use the Tmap aligner. Defaults NULL
+#' @param filename The filename that will be used for the output pdf file.
+#' @keywords binding_region
+#' @export
+#' @examples
+#' RACEseq()
+
+
+
+RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, str, end, filename, tmap ) {
 
   if(missing(str)) stop("str value must be set")
   if(missing(end)) stop("end value must be set")
@@ -42,18 +60,15 @@ main_RACE_seq_R<- function(input_data, replicon_ref, mismatch, RACE_adapter, str
     }
   }
 
-  if(missing(mismatch)) mismatch<- 0
-  out_name<- "alignment"
-
-  if(missing(aligner)) {
-    bowtie_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name)
+  if(missing(tmap)) {
+    bowtie_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name = "alignment")
   } else {
-    tmap_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name)
+    tmap_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name = "alignment")
   }
 
   binding_region <- datafile_out(str, end, replicon_ref)
 
-  del_files("read_count_")
+  del_files("read_counts")
   del_files("fasta.tmap.")
   del_files("aligned.bam")
   del_files("out.sam")
