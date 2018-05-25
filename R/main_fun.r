@@ -17,7 +17,7 @@
 
 
 
-RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, str, end, filename, tmap ) {
+RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, str=NULL, end=NULL, filename, tmap =NULL) {
 
 
   #Main function to call all sub founctions in main RACEseqR directory R.

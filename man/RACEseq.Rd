@@ -4,8 +4,8 @@
 \alias{RACEseq}
 \title{RACEseq main function}
 \usage{
-RACEseq(input_data, replicon_ref, mismatch = 0, RACE_adapter = NULL, str,
-  end, filename, tmap)
+RACEseq(input_data, replicon_ref, mismatch = 0, RACE_adapter = NULL,
+  str = NULL, end = NULL, filename, tmap = NULL)
 }
 \arguments{
 \item{input_data}{The input .fastq files to be used for the alignment.}
