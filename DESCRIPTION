@@ -1,6 +1,6 @@
 Package: RACEseqR
 Title: Downstream analysis package for 5-RACE Next Generation Sequencing experiments
-Version: 0.0.2.5000
+Version: 0.0.2.9000
 Authors@R: person("Pantazis", "Theotokis", email = "pan.theo@hotmail.com", role = c("aut", "cre"))
 Description: A Next Generation Sequencing data analysis pipeline packed as an R package. The pipeline uses popular command line tools for the downstream analysis of a 5-RACE sequencig experiment.
 Depends: R (>= 3.4.0)

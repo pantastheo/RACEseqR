@@ -74,6 +74,7 @@ bowtie_align <- function(input_data, replicon_ref, mismatch, RACE_adapter, out_n
     print(paste0("Performing alignment with ", mismatch, " mismatch using bowtie"))
     CMD_bow<- paste("bowtie -p 2 -S -k 1 -v ", mismatch, " index ", input_data," | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
     system(CMD_bow)
+    del_files("index")
 
   } else {
     #build the index
@@ -84,6 +85,8 @@ bowtie_align <- function(input_data, replicon_ref, mismatch, RACE_adapter, out_n
     print(paste0("Performing adapter trimming and alignment with ", mismatch, " mismatch using bowtie"))
     CMD_bow<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |bowtie -p 8 -S -k 1 -v ", mismatch, " index - | samtools view -bS - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
     system(CMD_bow)
+    del_files("index")
+    
   }
 
 }
@@ -118,6 +121,9 @@ tmap_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, out_nam
     print(paste0("Performing alignment with ", mismatch, " mismatch using tmap"))
     CMD_tmap<- paste("tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -r ", input_data, " | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
     system(CMD_tmap)
+    del_files("fasta.tmap.")
+    del_files("aligned.bam")
+    del_files("out.sam")
 
   } else {
     #build the index
@@ -128,6 +134,10 @@ tmap_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, out_nam
     print(paste0("Performing adapter trimming and alignment with ", mismatch, " mismatch using tmap"))
     CMD_tmap<- paste("cutadapt -g ", RACE_adapter, " -e0 --no-indels -m10 --discard-untrimmed --quiet ", input_data," |tmap map1 -a 0 -g 3 --max-mismatches ",mismatch," -f ", replicon_ref," -i fastq | samtools view -bt ", replicon_ref," - | genomeCoverageBed -d -5 -ibam stdin > read_counts_mm",mismatch,"_",out_name,".txt", sep="")
     system(CMD_tmap)
+    del_files("fasta.tmap.")
+    del_files("aligned.bam")
+    del_files("out.sam")
+ 
   }
 }
 
@@ -145,7 +155,7 @@ tmap_align <- function(input_data, replicon_ref,mismatch,  RACE_adapter, out_nam
 #' out_csv()
 
 
-datafile_out<- function(str, end, replicon_ref) {
+datafile_out<- function(str, end, replicon_ref, filename) {
 
   #setting function call conditions
   if(missing(str)) stop("str value must be set")
@@ -162,12 +172,12 @@ datafile_out<- function(str, end, replicon_ref) {
 
   #read the output  file
   #input reads in .txt format
-  out_reads<- list.files(".", pattern =".txt", all.files = F, full.names = F)
+  out_reads<- list.files(".", pattern ="alignment", all.files = F, full.names = F)
   if ((length(out_reads))==0) {
-    stop("No output reads file available")
+    stop("No output alignment file available")
   } else if ((length(out_reads))>=2) {
-    stop("More than one output reads file")
-  }
+    stop("More than one output alignment file available")
+  } else reads<- read.delim(out_reads, header = F, quote = " ")
 
   #create dataframe with reference and reads
 
@@ -180,10 +190,11 @@ datafile_out<- function(str, end, replicon_ref) {
 
   #focusing on target region can be ajusted acording to experiment
   binding_region <- dataframe[str:end,]
-
+  colnames(binding_region)<- c("reference", "position", "count", "nucleotide", "percentage", "log10" )
+  
   out_name<- file_path_sans_ext(((strsplit(out_reads, "_")) [[1]])[[2]])
 
-  write.table(binding_region, file = paste0("datafile_",out_name, ".txt") , sep = "\t", col.names = c("reference", "position", "count", "nucleotide", "percentage", "log10" ), row.names = F )
+  write.table(binding_region, file = paste0("datafile_",filename ,"_",out_name, ".txt") , sep = "\t", col.names = c("reference", "position", "count", "nucleotide", "percentage", "log10" ), row.names = F , quote = FALSE)
 
   return(binding_region)
 }
@@ -203,7 +214,7 @@ datafile_out<- function(str, end, replicon_ref) {
 plot_out<- function(binding_region, filename) {
 
   #setting function call conditions
-  if(missing(filename)) filename<- "RACE_graph"
+  if(missing(filename)) filename<- "plot"
   if(missing(binding_region)){
     #read the output binding region tab delim file
     #input reads from working dir
@@ -273,7 +284,15 @@ plot_out<- function(binding_region, filename) {
 
 
 
-RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, str=NULL, end=NULL, filename, tmap =NULL) {
+RACEseq<- function(input_data, 
+                   replicon_ref,
+                   filename,
+                   mismatch = 0, 
+                   RACE_adapter, 
+                   str=NULL, 
+                   end=NULL, 
+                   tmap =NULL, 
+                   plot=NULL) {
 
 
   #Main function to call all sub founctions in main RACEseqR directory R.
@@ -291,7 +310,8 @@ RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, st
   #List of required libraries to be loaded
   suppressMessages(packages(Biostrings))
   suppressMessages(packages(tools))
-
+  
+  if(missing(filename)) stop("Please specify an output filename")
   if(missing(str)) stop("str value must be set")
   if(missing(end)) stop("end value must be set")
   if(!str %in% seq(1, 10000000, by = 1)) stop("str value must be >= 1)")
@@ -318,11 +338,13 @@ RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, st
 
   if(missing(tmap)) {
     bowtie_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name = "alignment")
-  } else {
+  } else if (tmap==F) {
+    bowtie_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name = "alignment")
+    } else 
     tmap_align(input_data, replicon_ref, mismatch, RACE_adapter, out_name = "alignment")
-  }
 
-  binding_region <- datafile_out(str, end, replicon_ref)
+
+  binding_region <- datafile_out(str, end, replicon_ref, filename)
 
   del_files("read_counts")
   del_files("fasta.tmap.")
@@ -330,8 +352,11 @@ RACEseq<- function(input_data, replicon_ref, mismatch = 0, RACE_adapter=NULL, st
   del_files("out.sam")
   del_files("index")
 
-  plot_out(binding_region, filename)
-
+  if(!missing(plot)) {
+    if(plot==T) {
+      plot_out(binding_region, filename)
+    } 
+  }
   return(binding_region)
 }
 
