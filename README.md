@@ -43,6 +43,7 @@ dataframe <- RACEseq(input_data, replicon_ref, mismatch = 0, RACE_adapter = NULL
 
 ## Arguments
 
+Arguments       | Description
 --------------  | --------------
 input_data      | The input .fastq files to be used for the alignment.
 replicon_ref    | The reference sequence to be used in the alignment.
